@@ -46,6 +46,22 @@ Run it with `mix run examples/counter.exs`, or see `examples/todo.exs` and
 `examples/pomodoro.exs` for the widgets. `guides/getting_started.md` is the
 one-page walkthrough and `guides/tutorial.md` goes deeper.
 
+Both guides are published at <https://uminocelo.github.io/terra> and at
+<https://hexdocs.pm/terra>.
+
+## Building the guides site
+
+The published guides are the output of a [Manto](https://github.com/uminocelo/manto)
+static build, driven from this repo. Clone Manto next to this one and run:
+
+```bash
+./scripts/build_guides.sh            # writes dist/, reads manto.json
+MANTO_DIR=~/code/manto ./scripts/build_guides.sh
+```
+
+`.github/workflows/pages.yml` runs the same script on every push to `main` and
+deploys `dist/` to GitHub Pages.
+
 Keys arrive as small runtime events such as `{:char, "j"}`, `:up`, or `:interrupt`, not as raw bytes. Map them to your own messages with `event_to_msg/2`, or let them pass through.
 
 ## How apps run
