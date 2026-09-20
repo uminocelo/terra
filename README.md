@@ -2,7 +2,7 @@
 
 A zero-dependency TUI library for Elixir built around an Elm-style `init` / `update` / `view` loop that always gives your terminal back.
 
-**Status:** version `0.1.0-dev`, work in progress, not on Hex yet. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place.
+**Status:** version `1.0.0`. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place.
 
 ## Requirements
 
@@ -16,7 +16,7 @@ Terra ships no runtime dependencies: no NIFs, no port drivers, no widget framewo
 ```elixir
 def deps do
   [
-    {:terra, "~> 0.1"}
+    {:terra, "~> 1.0"}
   ]
 end
 ```
@@ -43,7 +43,7 @@ Terra.run(Counter)
 ```
 
 Run it with `mix run examples/counter.exs`, or see `examples/todo.exs` and
-`examples/pomodoro.exs` for the v0.2 widgets. `guides/getting_started.md` is the
+`examples/pomodoro.exs` for the widgets. `guides/getting_started.md` is the
 one-page walkthrough and `guides/tutorial.md` goes deeper.
 
 Keys arrive as small runtime events such as `{:char, "j"}`, `:up`, or `:interrupt`, not as raw bytes. Map them to your own messages with `event_to_msg/2`, or let them pass through.

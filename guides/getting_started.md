@@ -9,7 +9,7 @@ working app, the event and command model, and headless tests.
 ```elixir
 def deps do
   [
-    {:terra, "~> 0.1"}
+    {:terra, "~> 1.0"}
   ]
 end
 ```
