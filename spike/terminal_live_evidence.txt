@@ -1,0 +1,24 @@
+
+=== quit ===
+[PASS] Terra disables ISIG so Ctrl+C is readable: termios={'icanon': False, 'echo': False, 'isig': False, 'ixon': True}
+[PASS] raw mode active while held: termios={'icanon': False, 'echo': False, 'isig': False, 'ixon': True}
+[PASS] alt screen + hidden cursor on enter: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': False, 'home': False}
+[PASS] alt screen + cursor restored on quit: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': False, 'home': False}
+[PASS] termios restored on quit: termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True}
+[PASS] clean exit status: exit=0
+
+=== Ctrl+C ===
+[PASS] Ctrl+C reaches the app as a byte: isig_during=False
+[PASS] Ctrl+C path restores and exits: exit=0 termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True} {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': False, 'home': False}
+
+=== raised callback ===
+[PASS] a raised callback restores before the error surfaces: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': False, 'home': False} exit=1
+[PASS] terminal usable after the raise: termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True}
+[PASS] non-zero exit status after the raise: exit=1
+
+=== run loop death ===
+[PASS] killing the run loop restores the terminal: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': False, 'home': False}
+[PASS] owner released after the loop died: m[?25h[?1049lLIVE INFO %{size: {80, 24}, entered?: true, raw?: true, terminal?: true} LIVE READY LIVE AFTER_KILL nil 
+[PASS] terminal usable after the loop died: termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True} exit=0
+
+14/14 live checks passed

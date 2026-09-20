@@ -1,0 +1,46 @@
+
+=== 1.1.1.1 + 1.1.1.3 keys and restore ===
+[PASS] 1.1.1.1 raw mode reaches the tty: termios={'icanon': False, 'echo': False, 'isig': True, 'ixon': True} raw=:ok size={80, 24} encoding=:unicode
+[PASS] 1.1.1.3 split CSI becomes one :up: events=[b':up', b':down', b':right', b':left', b':enter', b':tab', b':backspace', b'{:char, "\xc3\xa9"}', b':escape', b'{:unknown, "\\e["}', b':quit']
+[PASS] 1.1.1.3 arrows/enter/tab/backspace decode: events=[b':up', b':down', b':right', b':left', b':enter', b':tab', b':backspace', b'{:char, "\xc3\xa9"}', b':escape', b'{:unknown, "\\e["}', b':quit']
+[PASS] 1.1.1.3 split UTF-8 becomes one :char: char events=[b'{:char, "\xc3\xa9"}']
+[PASS] 1.1.1.3 lone ESC flushes to :escape: events=[b':up', b':down', b':right', b':left', b':enter', b':tab', b':backspace', b'{:char, "\xc3\xa9"}', b':escape', b'{:unknown, "\\e["}', b':quit']
+[PASS] 1.1.1.3 truncated sequence flushes as :unknown: events=[b':up', b':down', b':right', b':left', b':enter', b':tab', b':backspace', b'{:char, "\xc3\xa9"}', b':escape', b'{:unknown, "\\e["}', b':quit']
+[PASS] 1.1.1.3 q quits: events=[b':up', b':down', b':right', b':left', b':enter', b':tab', b':backspace', b'{:char, "\xc3\xa9"}', b':escape', b'{:unknown, "\\e["}', b':quit']
+[PASS] 1.1.1.2 restore leaves alt screen: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': True, 'home': True}
+[PASS] 1.1.1.2 restore shows the cursor: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': True, 'home': True}
+[PASS] 1.1.1.2 cooked mode restored: termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True}
+[PASS] 1.1.1.2 explicit exit status 0: exit=0
+[INFO] quit path runs System.at_exit: at_exit_output=False (System.halt skips at_exit; restore is explicit here)
+
+=== 1.1.1.2 raise ===
+[PASS] 1.1.1.2 restore after raise: {'alt_enter': True, 'alt_leave': True, 'cursor_hide': True, 'cursor_show': True, 'clear': True, 'home': True}
+[PASS] 1.1.1.2 cooked mode after raise: termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True}
+[PASS] 1.1.1.2 error is not swallowed: exit=1
+[PASS] 1.1.1.2 restore happens before the error surfaces: RESTORED_BEFORE_RERAISE precedes the raise message
+
+=== 1.1.1.2 Ctrl+C (ISIG on) ===
+[INFO] Ctrl+C while ISIG is left on (as start_interactive leaves it): isig=True exit=still-alive alt_leave=False events=[] (the tty swallows the byte; the VM ignores the resulting SIGINT)
+[PASS] 1.1.1.2 Ctrl+C alone is not enough without disabling ISIG: exit=still-alive alt_leave=False termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True}
+
+=== 1.1.1.2 Ctrl+C (ISIG off) ===
+[PASS] 1.1.1.2 Ctrl+C byte handled when ISIG is off: isig_during=False isig_result={:status, 0} events=[b':interrupt'] exit=0 alt_leave=True isig_restored=True
+
+=== 1.1.1.2 SIGINT ===
+[INFO] external SIGINT: exit=still-alive alt_leave=False termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True} (:os.set_signal rejects :sigint; the VM neither dies nor restores)
+
+=== 1.1.1.2 SIGTERM ===
+[PASS] 1.1.1.2 SIGTERM leaves the terminal usable: set_signal=:ok exit=0 termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True}
+[INFO] SIGTERM escape sequences: alt_leave=False (no Elixir hook runs; the Erlang tty driver restores termios, but the alt screen is left until an explicit restore)
+
+=== 1.1.1.4 bench ===
+[PASS] 1.1.1.4 frame time recorded: avg=0.131ms gen=0.047ms p50=0.123ms p95=0.19ms max=0.217ms total=15.719ms exit=0
+[PASS] 1.1.1.4 measured under 5 ms for 80x24: avg=0.131ms
+
+20/20 checks passed, 4 findings
+
+Findings (raw evidence, not pass/fail):
+  - quit path runs System.at_exit: at_exit_output=False (System.halt skips at_exit; restore is explicit here)
+  - Ctrl+C while ISIG is left on (as start_interactive leaves it): isig=True exit=still-alive alt_leave=False events=[] (the tty swallows the byte; the VM ignores the resulting SIGINT)
+  - external SIGINT: exit=still-alive alt_leave=False termios={'icanon': True, 'echo': True, 'isig': True, 'ixon': True} (:os.set_signal rejects :sigint; the VM neither dies nor restores)
+  - SIGTERM escape sequences: alt_leave=False (no Elixir hook runs; the Erlang tty driver restores termios, but the alt screen is left until an explicit restore)
