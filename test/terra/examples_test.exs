@@ -9,6 +9,7 @@ defmodule Terra.ExamplesTest do
     Code.require_file("menu_app.exs", @examples)
     Code.require_file("todo_app.exs", @examples)
     Code.require_file("pomodoro_app.exs", @examples)
+    Code.require_file("keys_app.exs", @examples)
     :ok
   end
 
@@ -176,6 +177,49 @@ defmodule Terra.ExamplesTest do
 
     ref = Process.monitor(machine)
     Terra.Test.send_keys(machine, [{:char, "q"}])
+    assert_receive {:DOWN, ^ref, :process, ^machine, :normal}
+  end
+
+  test "the keys example records the last 20 events" do
+    machine = Terra.Test.start(Keys, width: 40, height: 30)
+
+    # 25 keys, none of them q: the ring keeps only the last 20.
+    Terra.Test.send_keys(machine, "abcdefghijklmnoprstuvwxyz")
+
+    state = Terra.Test.state(machine)
+    assert state.count == 25
+    assert length(state.events) == 20
+    assert hd(state.events) == {:char, "z"}
+
+    snapshot = Terra.Test.render(machine)
+    assert snapshot =~ "last 20 of 25 events"
+    assert snapshot =~ ~s({:char, "z"})
+
+    Terra.Test.stop(machine)
+  end
+
+  test "the keys example shows a multi-byte grapheme as one event" do
+    machine = Terra.Test.start(Keys, width: 40, height: 10)
+
+    Terra.Test.send_keys(machine, "é")
+
+    assert Terra.Test.state(machine).events == [{:char, "é"}]
+    assert Terra.Test.render(machine) =~ ~s({:char, "é"})
+
+    Terra.Test.stop(machine)
+  end
+
+  test "the keys example quits with q and with Ctrl+C" do
+    machine = Terra.Test.start(Keys, width: 40, height: 10)
+    ref = Process.monitor(machine)
+
+    Terra.Test.send_keys(machine, [{:char, "q"}])
+    assert_receive {:DOWN, ^ref, :process, ^machine, :normal}
+
+    machine = Terra.Test.start(Keys, width: 40, height: 10)
+    ref = Process.monitor(machine)
+
+    Terra.Test.send_keys(machine, [:interrupt])
     assert_receive {:DOWN, ^ref, :process, ^machine, :normal}
   end
 end

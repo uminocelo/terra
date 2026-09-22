@@ -55,6 +55,8 @@ Keys arrive as a small runtime event union, never as raw bytes:
 Partial escape and UTF-8 sequences are buffered, so a split arrow or a split
 multi-byte character is emitted once, correctly.
 
+Run the key debugger to watch events arrive as Terra parses them: `mix run examples/keys.exs`.
+
 Map events to your own messages with `event_to_msg/2`, or return `:ignore` to
 drop an event:
 

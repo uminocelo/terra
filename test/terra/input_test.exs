@@ -226,4 +226,44 @@ defmodule Terra.InputTest do
       assert Process.alive?(input)
     end
   end
+
+  describe "parser fixtures" do
+    # Byte chunks as a real terminal might deliver them, and the events the
+    # parser must emit. Unknown sequences are dropped, per the Parser docs.
+    @fixtures [
+      {"half an arrow is held, never a false :esc", ["\e["], []},
+      {"a CSI split across two reads is one arrow", ["\e[", "A"], [:up]},
+      {"a UTF-8 grapheme split across two reads is one char", [<<0xC3>>, <<0xA9>>],
+       [{:char, "é"}]},
+      {"Ctrl+C is an interrupt event", [<<0x03>>], [:interrupt]},
+      {"an unknown CSI sequence is dropped", ["\e[1;5A"], []},
+      {"an unknown escape sequence is dropped", ["\ej"], []}
+    ]
+
+    for {name, chunks, expected} <- @fixtures do
+      @tag fixture: name
+      test name do
+        chunks = unquote(Macro.escape(chunks))
+        expected = unquote(Macro.escape(expected))
+
+        input = start_supervised!({Terra.Input, [owner: self(), read: false, flush_ms: 60_000]})
+
+        Enum.each(chunks, &Terra.Input.feed(input, &1))
+
+        assert collect_events(expected) == expected
+      end
+    end
+
+    defp collect_events(expected, acc \\ []) do
+      if expected != [] and length(acc) >= length(expected) do
+        acc
+      else
+        receive do
+          {:terra_input, events} when is_list(events) -> collect_events(expected, acc ++ events)
+        after
+          200 -> acc
+        end
+      end
+    end
+  end
 end
