@@ -2,9 +2,9 @@ defmodule Terra.Runtime do
   @moduledoc """
   The process that runs one Terra app.
 
-  It owns the terminal (when live), the input reader, tick timers and the last
-  rendered frame, and it feeds events through the app's `event_to_msg/2` and
-  `update/2`.
+  It owns the terminal (when live), the input reader, tick timers, running
+  commands and the last rendered frame, and it feeds events through the app's
+  `event_to_msg/2` and `update/2`.
 
   Everything that can escape to the user goes through one boundary: a callback that
   raises does not crash quietly inside the loop. The runtime restores the terminal,
@@ -61,6 +61,7 @@ defmodule Terra.Runtime do
             width: 80,
             height: 24,
             timers: [],
+            commands: [],
             resize?: false,
             theme: nil,
             prev_grid: nil,
@@ -254,6 +255,16 @@ defmodule Terra.Runtime do
     end
   end
 
+  def handle_info({:terra_command, pid, msg, result}, state) do
+    state = %{state | commands: List.delete(state.commands, pid)}
+
+    case apply_update(state, {msg, result}) do
+      {:ok, state} -> {:noreply, state}
+      {:quit, state} -> finish_stop(state)
+      {:error, error, state} -> {:stop, error, state}
+    end
+  end
+
   def handle_info({:DOWN, ref, :process, _pid, _reason}, %__MODULE__{monitor: ref} = state) do
     {:stop, :normal, state}
   end
@@ -270,6 +281,7 @@ defmodule Terra.Runtime do
   @impl true
   def terminate(_reason, state) do
     cancel_timers(state.timers)
+    cancel_commands(state.commands)
     unsubscribe_resize(state)
     restore(state)
     :ok
@@ -528,12 +540,20 @@ defmodule Terra.Runtime do
         ref = Process.send_after(self(), {:terra_tick, msg}, ms)
         %{state | timers: [ref | state.timers]}
 
+      {:read_file, _path, _msg} = command, state ->
+        %{state | commands: [Terra.Command.run(command, self()) | state.commands]}
+
+      {:port, _cmd, _msg} = command, state ->
+        %{state | commands: [Terra.Command.run(command, self()) | state.commands]}
+
       _other, state ->
         state
     end)
   end
 
   defp cancel_timers(timers), do: Enum.each(timers, &Process.cancel_timer/1)
+
+  defp cancel_commands(pids), do: Enum.each(pids, &Process.exit(&1, :kill))
 
   defp run_callback(fun) do
     {:ok, fun.()}

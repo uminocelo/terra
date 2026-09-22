@@ -24,13 +24,17 @@ defmodule Terra.App do
   A command is a value the runtime executes, not a function you call:
 
       {:tick, ms, msg}
+      {:read_file, path, msg}
+      {:port, cmd, msg}
 
-  After `ms` milliseconds the runtime delivers `msg` to `update/2`. `init/1` may
-  return commands so a monitor or spinner can start polling immediately.
+  After `ms` milliseconds the runtime delivers `msg` to `update/2`. File and
+  port commands deliver `{msg, {:ok, data} | {:error, reason}}` instead; see
+  `Terra.Command` for the exact shapes. `init/1` may return commands so a
+  monitor or spinner can start polling immediately.
   """
 
   @type state :: term
-  @type command :: {:tick, non_neg_integer, term}
+  @type command :: Terra.Command.t()
 
   @doc "Returns the initial state, or `{state, commands}`."
   @callback init(keyword) :: state | {state, [command]}
