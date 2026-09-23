@@ -203,7 +203,10 @@ defmodule Terra.RuntimeTest do
     test "restores, then re-raises a raised view/1" do
       capture_log(fn ->
         assert_raise RuntimeError, "boom from view/1", fn ->
-          Runtime.run(Terra.RuntimeTest.BoomView, terminal: true, terminal_backend: CaptureBackend)
+          Runtime.run(Terra.RuntimeTest.BoomView,
+            terminal: true,
+            terminal_backend: CaptureBackend
+          )
         end
       end)
 
