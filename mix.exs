@@ -4,7 +4,7 @@ defmodule Terra.MixProject do
   def project do
     [
       app: :terra,
-      version: "1.0.0",
+      version: "1.1.0",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -12,7 +12,12 @@ defmodule Terra.MixProject do
       package: package(),
       docs: [
         main: "readme",
-        extras: ["README.md", "guides/getting_started.md", "guides/tutorial.md"]
+        extras: [
+          "README.md",
+          "guides/getting_started.md",
+          "guides/tutorial.md",
+          "guides/effects.md"
+        ]
       ],
       source_url: "https://github.com/uminocelo/terra"
     ]
@@ -30,7 +35,15 @@ defmodule Terra.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/uminocelo/terra"},
-      files: ["lib", "guides", "mix.exs", ".formatter.exs", "README.md", "LICENSE"]
+      files: [
+        "lib",
+        "guides",
+        "mix.exs",
+        ".formatter.exs",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+      ]
     ]
   end
 end

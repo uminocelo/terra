@@ -8,6 +8,9 @@ model, commands, layout, widgets and headless tests.
   contract.
 - [[tutorial|Tutorial]] is the deep dive: a counter, tick-driven work, a
   keyboard menu, layout, styling and testing without a terminal.
+- [[effects|Effects as data]] is the effects page: `view/1` stays pure,
+  `{:read_file, path, msg}` and `{:port, cmd, msg}` run off the view path, and
+  the mix test watcher shows the whole pattern.
 
 ## Where to start
 
@@ -24,7 +27,8 @@ understand every part of the loop before writing your own app, read
 
 ## In this repo
 
-- `examples/` - counter, tick spinner, menu, todo and pomodoro apps
+- `examples/` - counter, tick spinner, menu, todo, pomodoro, key debugger and
+  mix test watcher apps
 - `lib/` - the runtime, view primitives, widgets, focus and themes
 - `test/` - headless tests driven with `Terra.Test`
 

@@ -82,7 +82,8 @@ def update(:tick, ticks), do: {ticks + 1, [{:tick, 100, :tick}]}
 ```
 
 After 100 ms the runtime delivers `:tick` to `update/2`. Return commands from
-`init/1` to start a timer immediately.
+`init/1` to start a timer immediately. `guides/effects.md` covers the file and
+port commands and the watcher example that motivates them.
 
 ## Rendering
 
@@ -119,6 +120,9 @@ Run an app as a script:
 ```bash
 mix run examples/counter.exs
 ```
+
+`examples/keys.exs` shows the last 20 parsed input events and
+`examples/test_watcher.exs` runs `mix test` as a command and lists failures.
 
 `iex -S mix` is **not supported**: IEx owns stdin, so raw mode, rendering and
 restore are not guaranteed there.

@@ -2,7 +2,7 @@
 
 A zero-dependency TUI library for Elixir built around an Elm-style `init` / `update` / `view` loop that always gives your terminal back.
 
-**Status:** version `1.0.0`. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place.
+**Status:** version `1.1.0`. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place, and `update/2` can return file and port commands so IO stays out of `view/1`.
 
 ## Requirements
 
@@ -43,10 +43,13 @@ Terra.run(Counter)
 ```
 
 Run it with `mix run examples/counter.exs`, or see `examples/todo.exs` and
-`examples/pomodoro.exs` for the widgets. `guides/getting_started.md` is the
-one-page walkthrough and `guides/tutorial.md` goes deeper.
+`examples/pomodoro.exs` for the widgets. `examples/keys.exs` debugs input by
+showing the last 20 parsed events, and `examples/test_watcher.exs` runs
+`mix test` as a port command and lists failures.
+`guides/getting_started.md` is the one-page walkthrough, `guides/tutorial.md`
+goes deeper, and `guides/effects.md` covers commands and the watcher.
 
-Both guides are published at <https://uminocelo.github.io/terra> and at
+The guides are published at <https://uminocelo.github.io/terra> and at
 <https://hexdocs.pm/terra>.
 
 ## Building the guides site
@@ -62,17 +65,20 @@ MANTO_DIR=~/code/manto ./scripts/build_guides.sh
 `.github/workflows/pages.yml` runs the same script on every push to `main` and
 deploys `dist/` to GitHub Pages.
 
-Keys arrive as small runtime events such as `{:char, "j"}`, `:up`, or `:interrupt`, not as raw bytes. Map them to your own messages with `event_to_msg/2`, or let them pass through.
-
 ## How apps run
 
 Each frame is rendered into a cell grid and diffed against the previous one, so
-only changed cells are written. `update/2` can return `{state, [{:tick, ms, msg}]}`
-to schedule work, and the runtime feeds resize events back as `{:resize, w, h}`.
+only changed cells are written. `update/2` can return commands as data:
+`{:tick, ms, msg}` schedules a message, `{:read_file, path, msg}` reads a file,
+and `{:port, cmd, msg}` runs a shell command. The runtime executes them off the
+view path and delivers the result to `update/2` as `{msg, {:ok, data} | {:error, reason}}`,
+so `view/1` stays pure. The runtime feeds resize events back as `{:resize, w, h}`.
 
 `Terra.Widget` provides stateless list, progress, spinner and text input views
 whose state stays in your app, `Terra.Focus` handles Tab order, and `Terra.Theme`
 supplies `fg` / `bg` / `accent` / `border` colors that views read at render time.
+
+Keys arrive as small runtime events such as `{:char, "j"}`, `:up`, or `:interrupt`, not as raw bytes. Map them to your own messages with `event_to_msg/2`, or let them pass through.
 
 ## Running inside IEx
 
