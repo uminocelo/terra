@@ -130,6 +130,8 @@ end
 defmodule Terra.RuntimeTest do
   use ExUnit.Case, async: false
 
+  import ExUnit.CaptureLog
+
   alias Terra.{Renderer, Runtime, Terminal}
   alias Terra.RuntimeTest.{CaptureBackend, Chain, Counter, Filter}
   alias Terra.Terminal.ANSI
@@ -199,9 +201,11 @@ defmodule Terra.RuntimeTest do
     end
 
     test "restores, then re-raises a raised view/1" do
-      assert_raise RuntimeError, "boom from view/1", fn ->
-        Runtime.run(Terra.RuntimeTest.BoomView, terminal: true, terminal_backend: CaptureBackend)
-      end
+      capture_log(fn ->
+        assert_raise RuntimeError, "boom from view/1", fn ->
+          Runtime.run(Terra.RuntimeTest.BoomView, terminal: true, terminal_backend: CaptureBackend)
+        end
+      end)
 
       assert CaptureBackend.output() =~ ANSI.alt_screen(false)
       assert Terminal.info() == nil
@@ -269,11 +273,13 @@ defmodule Terra.RuntimeTest do
       machine = Terra.Test.start(Terra.RuntimeTest.BoomUpdate)
       ref = Process.monitor(machine)
 
-      Terra.Test.send_keys(machine, "x")
+      capture_log(fn ->
+        Terra.Test.send_keys(machine, "x")
 
-      assert_receive {:DOWN, ^ref, :process, ^machine,
-                      {:callback_error, :error, %RuntimeError{message: "boom from update/2"},
-                       _stack}}
+        assert_receive {:DOWN, ^ref, :process, ^machine,
+                        {:callback_error, :error, %RuntimeError{message: "boom from update/2"},
+                         _stack}}
+      end)
     end
   end
 
@@ -302,13 +308,15 @@ defmodule Terra.RuntimeTest do
     end
 
     test "a raised view/1 restores before the error surfaces" do
-      assert {:error, {:callback_error, :error, %RuntimeError{}, _stack}} =
-               Runtime.start(Terra.RuntimeTest.BoomView,
-                 terminal: true,
-                 terminal_backend: CaptureBackend,
-                 read: false,
-                 owner: self()
-               )
+      capture_log(fn ->
+        assert {:error, {:callback_error, :error, %RuntimeError{}, _stack}} =
+                 Runtime.start(Terra.RuntimeTest.BoomView,
+                   terminal: true,
+                   terminal_backend: CaptureBackend,
+                   read: false,
+                   owner: self()
+                 )
+      end)
 
       assert CaptureBackend.output() =~ ANSI.alt_screen(false)
       assert Terminal.info() == nil
