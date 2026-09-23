@@ -1,0 +1,38 @@
+Running ExUnit with seed: 123456, max_cases: 16
+
+..
+
+  1) test parses a record (ParserTest)
+     test/parser_test.exs:12
+     Assertion with == failed
+     code:  assert parse("a,b") == ["a", "b"]
+     left:  ["a,b"]
+     right: ["a", "b"]
+     stacktrace:
+       test/parser_test.exs:13: (test)
+
+.
+
+  2) test renders a row (RowTest)
+     test/row_test.exs:20
+     match (=) failed
+     code:  assert {:ok, row} = render(data)
+     left:  {:ok, row}
+     right: {:error, :empty}
+     stacktrace:
+       test/row_test.exs:21: (test)
+
+  3) doctest Formatter.docs/1 (FormatterTest)
+     test/formatter_test.exs:3
+     Doctest failed
+     doctest:
+       iex> Formatter.docs(nil)
+       []
+     stacktrace:
+       lib/formatter.ex:10: Formatter (module)
+
+...
+
+Finished in 0.09 seconds (0.09s async, 0.00s sync)
+
+9 tests, 3 failures

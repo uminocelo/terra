@@ -28,7 +28,12 @@ defmodule Terra.CommandTest do
 
   describe "read_file command" do
     test "init/1 can schedule a read and the result arrives as {msg, {:ok, data}}" do
-      path = Path.join(System.tmp_dir!(), "terra_command_test_#{System.unique_integer([:positive])}.txt")
+      path =
+        Path.join(
+          System.tmp_dir!(),
+          "terra_command_test_#{System.unique_integer([:positive])}.txt"
+        )
+
       File.write!(path, "hello terra")
       on_exit(fn -> File.rm(path) end)
 
@@ -41,7 +46,11 @@ defmodule Terra.CommandTest do
     end
 
     test "a missing file arrives as {msg, {:error, reason}}" do
-      path = Path.join(System.tmp_dir!(), "terra_command_test_missing_#{System.unique_integer([:positive])}")
+      path =
+        Path.join(
+          System.tmp_dir!(),
+          "terra_command_test_missing_#{System.unique_integer([:positive])}"
+        )
 
       machine = Terra.Test.start(FileApp, app: [path: path])
 
