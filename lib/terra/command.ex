@@ -43,6 +43,7 @@ defmodule Terra.Command do
         :binary,
         :stream,
         :exit_status,
+        :stderr_to_stdout,
         args: ["-c", cmd]
       ])
 
