@@ -1,6 +1,10 @@
 defmodule Terra.TestWatcherTest do
   use ExUnit.Case, async: true
 
+  # TestWatcher lives in examples/ and is loaded in setup_all, so direct calls
+  # here would warn at compile time about an undefined module.
+  @compile {:no_warn_undefined, [TestWatcher, TestWatcher.MixTest]}
+
   @examples Path.expand("../../examples", __DIR__)
   @fixtures Path.expand("../fixtures/mix_test", __DIR__)
 
@@ -21,6 +25,35 @@ defmodule Terra.TestWatcherTest do
       assert result.total == 5
       assert result.failed == 0
       assert result.passed == 5
+    end
+
+    test "the ExUnit 1.20 passing summary parses" do
+      result = TestWatcher.MixTest.parse(fixture("pass_120.txt"))
+
+      assert result.failures == []
+      assert result.total == 5
+      assert result.failed == 0
+      assert result.passed == 5
+    end
+
+    test "the ExUnit 1.20 failing summary parses" do
+      result = TestWatcher.MixTest.parse(fixture("fail_120.txt"))
+
+      assert result.total == 4
+      assert result.failed == 1
+      assert result.passed == 3
+
+      assert [
+               %{
+                 name: "test adds two numbers (MathTest)",
+                 file: "test/math_test.exs",
+                 line: 8,
+                 assertion: assertion
+               }
+             ] = result.failures
+
+      assert assertion =~ "Assertion with == failed"
+      refute assertion =~ "stacktrace"
     end
 
     test "one failure parses into file, line, name and assertion" do

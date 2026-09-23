@@ -13,7 +13,13 @@ defmodule TestWatcher.MixTest do
   @failure_header ~r/^\s*\d+\)\s+(?:test|doctest)\s+/
   @location ~r/^\s+(\S+\.exs?):(\d+)\s*$/
   @stacktrace ~r/^\s*stacktrace:/
+  # Legacy ExUnit (<= 1.19): "9 tests, 3 failures"
   @summary ~r/^(\d+) tests?, (\d+) failures?/
+  # ExUnit 1.20+: "Result: 9 passed" for green runs,
+  # "Result: 6/9 passed" plus "Failed: 3 tests" for red runs.
+  @result_passed ~r/^Result: (\d+) passed/
+  @result_ratio ~r/^Result: (\d+)\/(\d+) passed/
+  @result_empty ~r/^Result: 0 tests/
 
   @doc """
   Parses output `lines` into a result map.
@@ -83,9 +89,30 @@ defmodule TestWatcher.MixTest do
   end
 
   defp summary(lines, default) do
-    case Enum.find_value(Enum.reverse(lines), &Regex.run(@summary, &1)) do
-      [_, total, failed] -> {String.to_integer(total), String.to_integer(failed)}
-      nil -> {default, default}
+    reversed = Enum.reverse(lines)
+
+    find = fn regex -> Enum.find_value(reversed, &Regex.run(regex, &1)) end
+
+    cond do
+      match = find.(@result_ratio) ->
+        [_, passed, total] = match
+        total = String.to_integer(total)
+        passed = String.to_integer(passed)
+        {total, max(total - passed, 0)}
+
+      match = find.(@result_passed) ->
+        [_, passed] = match
+        {String.to_integer(passed), 0}
+
+      find.(@result_empty) ->
+        {0, 0}
+
+      match = find.(@summary) ->
+        [_, total, failed] = match
+        {String.to_integer(total), String.to_integer(failed)}
+
+      true ->
+        {default, default}
     end
   end
 end
