@@ -1,8 +1,11 @@
 # Getting Started
 
-Terra is a zero-dependency TUI library for Elixir built around an
-Elm-style `init` / `update` / `view` loop. This page is one page: install, a
-working app, the event and command model, and headless tests.
+Zero-dependency TUI for Elixir. Elm-style `init` / `update` / `view`,
+cell-grid diffs, restore on every exit. OTP 28+.
+
+- [Hex](https://hex.pm/packages/terra)
+- [GitHub](https://github.com/uminocelo/terra)
+- [HexDocs](https://hexdocs.pm/terra)
 
 ## Install
 

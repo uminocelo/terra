@@ -1,5 +1,9 @@
 # Terra
 
+[![Hex.pm](https://img.shields.io/hexpm/v/terra.svg)](https://hex.pm/packages/terra)
+[![Hexdocs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/terra)
+[![License](https://img.shields.io/hexpm/l/terra.svg)](https://github.com/uminocelo/terra/blob/main/LICENSE)
+
 A zero-dependency TUI library for Elixir built around an Elm-style `init` / `update` / `view` loop that always gives your terminal back.
 
 **Status:** version `1.1.0`. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place, and `update/2` can return file and port commands so IO stays out of `view/1`.

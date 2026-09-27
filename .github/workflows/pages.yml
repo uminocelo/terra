@@ -1,9 +1,8 @@
-name: Pages
+name: Docs
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,34 +18,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Check out Manto
-        uses: actions/checkout@v4
-        with:
-          repository: uminocelo/manto
-          path: manto
-
       - uses: erlef/setup-beam@v1
         with:
-          elixir-version: "1.18.4"
-          otp-version: "27.2.4"
-
-      - name: Build the guides with Manto
-        run: ./scripts/build_guides.sh
-        env:
-          MANTO_DIR: ${{ github.workspace }}/manto
-          OUTPUT_DIR: ${{ github.workspace }}/dist
-
+          otp-version: "28"
+          elixir-version: "1.18"
+      - run: mix deps.get
+      - run: mix docs
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: doc
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - id: deployment
+      - id: deploy
         uses: actions/deploy-pages@v4
