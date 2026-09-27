@@ -73,8 +73,7 @@ defmodule Terra.MixProject do
         View: [Terra.View, Terra.Renderer, Terra.Widget, Terra.Focus, Terra.Theme],
         Test: [Terra.Test]
       ],
-      source_url_pattern:
-        "https://github.com/uminocelo/terra/blob/main/%{path}#L%{line}",
+      source_url_pattern: "https://github.com/uminocelo/terra/blob/main/%{path}#L%{line}",
       formatters: ["html"]
     ]
   end
