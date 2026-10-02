@@ -6,7 +6,7 @@
 
 A zero-dependency TUI library for Elixir built around an Elm-style `init` / `update` / `view` loop that always gives your terminal back.
 
-**Status:** version `1.1.0`. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place, and `update/2` can return file and port commands so IO stays out of `view/1`.
+**Status:** version `1.1.1`. The terminal layer, input parser, renderer, run loop, headless test helpers, differential painting, widgets, focus and themes are all in place, and `update/2` can return file and port commands so IO stays out of `view/1`.
 
 ## Requirements
 
@@ -20,7 +20,7 @@ Terra ships no runtime dependencies: no NIFs, no port drivers, no widget framewo
 ```elixir
 def deps do
   [
-    {:terra, "~> 1.0"}
+    {:terra, "~> 1.1"}
   ]
 end
 ```
@@ -112,6 +112,8 @@ Terra owns the terminal only while your app runs, and it puts the terminal back 
 - the process that started `Terra.run/1` dying, or the runtime being killed
 
 After each path the terminal is in cooked mode, the cursor is visible, and you are back on the main screen. If a callback raises, Terra restores first and then lets the error surface; it is never swallowed.
+
+[![Ctrl+C leaves a shell that can echo](docs/restore.gif)](docs/restore.gif)
 
 ## How it fits next to TermUI and Tuix
 

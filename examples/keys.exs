@@ -4,7 +4,8 @@
 #
 # Press keys and watch them arrive as parsed events (`:up`, `{:char, "é"}`,
 # `:tab`, `:interrupt`, `{:resize, w, h}`). Press q or Ctrl+C to quit and
-# restore the terminal.
+# restore the terminal. Press ! to raise in `view/1`; the error is printed
+# after the terminal is restored.
 
 Code.require_file("keys_app.exs", __DIR__)
 
