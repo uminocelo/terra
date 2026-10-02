@@ -12,7 +12,7 @@ cell-grid diffs, restore on every exit. OTP 28+.
 ```elixir
 def deps do
   [
-    {:terra, "~> 1.0"}
+    {:terra, "~> 1.1"}
   ]
 end
 ```
@@ -127,8 +127,21 @@ mix run examples/counter.exs
 `examples/keys.exs` shows the last 20 parsed input events and
 `examples/test_watcher.exs` runs `mix test` as a command and lists failures.
 
-`iex -S mix` is **not supported**: IEx owns stdin, so raw mode, rendering and
-restore are not guaranteed there.
+## When there is no terminal
+
+`mix test` needs no terminal. `Terra.Test` runs headless, so a CI job can
+render snapshots and send keys without a TTY. That is the supported
+non-interactive path.
+
+Piped stdin is not a supported way to drive the UI. If stdin is not a TTY
+(a pipe, `< /dev/null`, or a CI step with no terminal), Terra does not enter
+raw mode. It may still write alternate-screen and cursor sequences to stdout,
+and the input reader follows the pipe until EOF, which stops the loop. That
+exit is not the restore contract, and a usable full-screen app is not
+promised there.
+
+`iex -S mix` is **not supported**. IEx owns stdin, so raw mode, rendering and
+restore are not guaranteed. Run apps with `mix run path/to/app.exs`.
 
 ## The restore contract
 
