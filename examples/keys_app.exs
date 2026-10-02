@@ -9,7 +9,8 @@ defmodule Keys do
 
   The runtime still owns restore: `q` returns `{:quit, state}` and `:interrupt`
   stops the loop after `update/2` records it, so Ctrl+C is visible in the ring
-  on the final frame.
+  on the final frame. `!` sets a flag that `view/1` raises on, so the crash
+  path can be scripted.
   """
 
   use Terra
@@ -17,10 +18,12 @@ defmodule Keys do
   @limit 20
 
   @impl Terra.App
-  def init(_opts), do: %{events: [], count: 0}
+  def init(_opts), do: %{events: [], count: 0, crash: false}
 
   @impl Terra.App
   def update({:char, "q"}, state), do: {:quit, state}
+
+  def update({:char, "!"}, state), do: %{state | crash: true}
 
   def update(event, state) do
     events = [event | state.events] |> Enum.take(@limit)
@@ -28,6 +31,10 @@ defmodule Keys do
   end
 
   @impl Terra.App
+  def view(%{crash: true}) do
+    raise "boom from view/1"
+  end
+
   def view(state) do
     rows =
       case state.events do
@@ -41,7 +48,7 @@ defmodule Keys do
         text(""),
         vstack(rows),
         text(""),
-        text("q or Ctrl+C to quit", dim: true)
+        text("q or Ctrl+C to quit, ! raises in view/1", dim: true)
       ]),
       title: "Keys",
       border: :rounded,
