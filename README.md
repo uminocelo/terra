@@ -113,6 +113,8 @@ Terra owns the terminal only while your app runs, and it puts the terminal back 
 
 After each path the terminal is in cooked mode, the cursor is visible, and you are back on the main screen. If a callback raises, Terra restores first and then lets the error surface; it is never swallowed.
 
+[![Ctrl+C leaves a shell that can echo](docs/restore.gif)](docs/restore.gif)
+
 ## How it fits next to TermUI and Tuix
 
 Terra is deliberately small. TermUI and Tuix are full widget frameworks with mature

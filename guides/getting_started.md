@@ -142,3 +142,5 @@ exit path:
 After each path: cooked mode, visible cursor, main screen. If a callback raises,
 Terra restores first and then lets the original error surface; it is never
 swallowed.
+
+[![Ctrl+C leaves a shell that can echo](../docs/restore.gif)](../docs/restore.gif)
